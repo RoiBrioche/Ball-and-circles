@@ -2,11 +2,12 @@ import pygame
 import sys
 
 from balle import Balle
+from cercle import Cercle
 
 # Initialisation de Pygame
 pygame.init()
 
-FPS = 80
+FPS = 65
 MOVIE_TIME = 61
 TOTAL_FRAMES = MOVIE_TIME*FPS
 
@@ -28,17 +29,19 @@ rayon_interieur = 20 # centre rouge
 
 # Boucle principale du jeu
 
+"""------------------------------------------------------------------------------------------"""
+clock = pygame.time.Clock()
+
 balle = Balle(
     x=LARGEUR // 2,
     y=HAUTEUR // 2,
     rayon=20,
     couleur_centre=(255, 0, 0),
     couleur_contour=(255, 255, 255),
-    vitesse=(0, 0)
 )
 
-"""------------------------------------------------------------------------------------------"""
-clock = pygame.time.Clock()
+cercle = Cercle(LARGEUR // 2, HAUTEUR // 2, 300, (255, 255, 255), 3)
+
 running = True
 
 while running:
@@ -50,9 +53,12 @@ while running:
             running = False
 
     # --- Logique du jeu (vide pour l'instant) ---
+    balle.update()
+    balle.rebond_sur_cercle(cercle)
 
     # --- Dessin ---
     fenetre.fill(COULEUR_FOND)
+    cercle.draw(fenetre)
     balle.draw(fenetre)
 
 
@@ -60,7 +66,7 @@ while running:
     pygame.display.flip()
 
     # --- Limite à 60 FPS ---
-    clock.tick(180)
+    clock.tick(FPS)
 
 """------------------------------------------------------------------------------------------"""
 
