@@ -1,7 +1,5 @@
 import math
 import pygame
-
-
 # --- Classe Balle ---
 class Balle:
     def __init__(self, x, y, rayon, couleur_centre, couleur_contour, vitesse=(5, 0)):
@@ -12,7 +10,35 @@ class Balle:
         self.couleur_contour = couleur_contour
         self.vx, self.vy = vitesse
 
+        # --- Nouveau : historique des positions ---
+        self.positions = []  # liste [(x1, y1), (x2, y2), ...]
+        self.max_positions = 80  # environ 1 seconde de traînée à 80 FPS
+
     def draw(self, surface):
+
+       # Surface temporaire pour gérer la transparence
+        trail_surface = pygame.Surface(surface.get_size(), pygame.SRCALPHA)
+        trail_surface.fill((0, 0, 0, 0))
+
+        if len(self.positions) > 1:
+            for i in range(1, len(self.positions)):
+                alpha = int(180 * (i / len(self.positions)))
+                r, g, b = self.couleur_centre
+                color = (int(r * 0.7), int(g * 0.7), int(b * 0.7), alpha)
+
+                start = self.positions[i - 1]
+                end = self.positions[i]
+                width = int(self.rayon * (i / len(self.positions)) + 1)
+
+                # Ligne principale
+                pygame.draw.line(trail_surface, color, start, end, width)
+
+                # Petits cercles de finition pour éviter les "trous"
+                pygame.draw.circle(trail_surface, color, (int(start[0]), int(start[1])), width // 2)
+                pygame.draw.circle(trail_surface, color, (int(end[0]), int(end[1])), width // 2)
+
+        surface.blit(trail_surface, (0, 0))
+
         """Dessine la balle (contour + centre)."""
         pygame.draw.circle(surface, self.couleur_contour, (int(self.x), int(self.y)), self.rayon + 1)
         pygame.draw.circle(surface, self.couleur_centre, (int(self.x), int(self.y)), self.rayon)
@@ -22,6 +48,12 @@ class Balle:
         self.vy += 0.3  # effet gravité
         self.x += self.vx
         self.y += self.vy
+
+        self.positions.append((self.x, self.y))
+
+        # Garde seulement les dernières positions
+        if len(self.positions) > self.max_positions:
+            self.positions.pop(0)
 
     def rebond_sur_cercle(self, cercle):
         """Détecte et applique le rebond sur le cercle donné."""
