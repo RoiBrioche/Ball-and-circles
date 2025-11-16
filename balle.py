@@ -1,5 +1,6 @@
 import math
 import pygame
+
 # --- Classe Balle ---
 class Balle:
     def __init__(self, x, y, rayon, couleur_centre, couleur_contour, vitesse=(5, 0)):
