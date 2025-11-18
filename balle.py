@@ -1,6 +1,7 @@
 import math
 import pygame
 
+
 # --- Classe Balle ---
 class Balle:
     def __init__(self, x, y, rayon, couleur_centre, couleur_contour, vitesse=(5, 0)):
@@ -17,7 +18,7 @@ class Balle:
 
     def draw(self, surface):
 
-       # Surface temporaire pour gérer la transparence
+        # Surface temporaire pour gérer la transparence
         trail_surface = pygame.Surface(surface.get_size(), pygame.SRCALPHA)
         trail_surface.fill((0, 0, 0, 0))
 
@@ -60,7 +61,7 @@ class Balle:
         """Détecte et applique le rebond sur le cercle donné."""
         dx = self.x - cercle.x
         dy = self.y - cercle.y
-        distance = math.sqrt(dx ** 2 + dy ** 2)
+        distance = math.sqrt(dx**2 + dy**2)
 
         if distance == 0:
             return  # éviter la division par zéro

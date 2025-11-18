@@ -1,6 +1,7 @@
 import pygame
 import math
 
+
 # --- Classe Cercle ---
 class Cercle:
     def __init__(self, x, y, diametre, couleur=(255, 255, 255), epaisseur=2, section_trou=0):

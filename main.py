@@ -9,18 +9,18 @@ from datetime import datetime
 
 
 FPS = 65
-DURATION_SECONDS = 61 
-TOTAL_FRAMES = DURATION_SECONDS*FPS
+DURATION_SECONDS = 61
+TOTAL_FRAMES = DURATION_SECONDS * FPS
 
 # --- Paramètres de la fenêtre ---
 LARGEUR = 1080
 HAUTEUR = 1920
 TITRE = "bounce_and_panic"
-COULEUR_FOND = (0,0,0)  # gris foncé
+COULEUR_FOND = (0, 0, 0)  # gris foncé
 
 # MODE = "video"  → génère uniquement le MP4, aucune fenêtre visible
 # MODE = "play"   → affiche la fenêtre + génère le MP4
-MODE = "video"     # CHANGE ICI selon ton besoin
+MODE = "video"  # CHANGE ICI selon ton besoin
 
 
 # -------------------------------------
@@ -50,7 +50,7 @@ else:
 # Position et taille de la balle
 x, y = LARGEUR // 2, HAUTEUR // 2
 rayon_exterieur = 21  # contour blanc
-rayon_interieur = 20 # centre rouge
+rayon_interieur = 20  # centre rouge
 
 # Boucle principale du jeu
 
@@ -74,7 +74,7 @@ cercle = Cercle(LARGEUR // 2, HAUTEUR // 2, 300, (255, 255, 255), 3)
 # -------------------------------------
 # WRITER MP4
 # -------------------------------------
-if MODE == "video" :
+if MODE == "video":
     writer = imageio.get_writer(output_path, fps=FPS)
 
 total_frames = FPS * DURATION_SECONDS
@@ -105,7 +105,7 @@ while running and frame_counter < total_frames:
     # --- Rafraîchissement ---
     pygame.display.flip()
 
-        # --- Enregistrement vidéo ---
+    # --- Enregistrement vidéo ---
     if MODE == "video":
         frame = pygame.surfarray.array3d(fenetre)
         frame = frame.swapaxes(0, 1)
@@ -124,7 +124,7 @@ while running and frame_counter < total_frames:
 # -------------------------------------
 if MODE == "video":
     writer.close()
-    
+
 # Quitter proprement
 pygame.quit()
 sys.exit()
