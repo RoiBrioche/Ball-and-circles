@@ -35,9 +35,9 @@ jobs:
         run: |
           python -m pytest tests/ -v --cov=. --cov-report=xml
 
-      - name: Check code formatting with Black
+      - name: Black - code formatting check
         run: |
-          black --check .
+          black . --check --diff --color --line-length 120
 
       - name: Lint with pylint
         run: |
@@ -54,10 +54,6 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN || 'none' }}
           file: ./coverage.xml
           fail_ci_if_error: false
-
-      - name: Black - code formatting check
-        run: |
-          black . --check --diff --color --line-length 120
 
       - name: Run unit tests (if any)
         run: |
