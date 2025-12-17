@@ -3,6 +3,8 @@ import pygame
 import sys
 import os
 
+from progress import update_progress
+
 from balle import Balle
 from cercle import Cercle
 from datetime import datetime
@@ -115,9 +117,7 @@ while running and frame_counter < total_frames:
     clock.tick(FPS)
     frame_counter += 1
     # Update progress in the same line
-    progress = (frame_counter / total_frames) * 100
-    sys.stdout.write(f"\rGenerating video: {frame_counter}/{total_frames} frames ({progress:.1f}%)")
-    sys.stdout.flush()
+    update_progress(frame_counter, total_frames)
 
 """------------------------------------------------------------------------------------------"""
 
