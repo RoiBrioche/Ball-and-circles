@@ -65,3 +65,29 @@ python main.py
 ```
 
 
+## 🧪 Tests
+
+Le projet inclut des tests unitaires pour s'assurer du bon fonctionnement du code.
+
+### Prérequis
+
+- Python 3.8+
+- pip
+
+### Installation des dépendances de test
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+### Exécution des tests
+Pour lancer tous les tests :
+```bash
+python -m pytest tests/ -v
+```
+
+Pour voir la couverture de code :
+
+```bash
+python -m pytest --cov=. tests/
+```
