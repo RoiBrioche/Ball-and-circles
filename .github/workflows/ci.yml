@@ -11,41 +11,46 @@ on:
       - "!main"
 
 jobs:
-  build-and-test:
+  test-and-lint:
+    name: Test and Lint
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python 3.12
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          python-version: '3.12'
+          cache: 'pip'
 
-      - name: Install project dependencies
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install -r requirements-dev.txt
 
-      - name: Install dev tools (black + coverage)
+      - name: Run tests with coverage
         run: |
-          pip install black coverage
+          python -m pytest tests/ -v --cov=. --cov-report=xml
 
       - name: Black - code formatting check
         run: |
           black . --check --diff --color --line-length 120
 
-      - name: Run unit tests (if any)
+      - name: Lint with pylint
         run: |
-          if [ -d "tests" ]; then
-            coverage run -m unittest discover -s tests
-          else
-            echo "Aucun dossier de tests détecté, skip."
-          fi
+          pylint --fail-under=7.0 .
 
-      - name: Coverage report
+      - name: Check types with mypy
         run: |
-          if [ -d "tests" ]; then
-            coverage report -m || true
-          fi
+          mypy .
+
+      - name: Upload coverage to Codecov
+        if: success()
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN || 'none' }}
+          file: ./coverage.xml
+          fail_ci_if_error: false

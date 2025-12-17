@@ -1,0 +1,30 @@
+[MASTER]
+# Allow C-extensions like pygame
+extension-pkg-whitelist=pygame
+
+[MESSAGES CONTROL]
+disable=
+    missing-module-docstring,
+    missing-class-docstring,
+    missing-function-docstring,
+
+    # Not relevant for simulation / data objects
+    too-many-arguments,
+    too-many-positional-arguments,
+    too-many-instance-attributes,
+    too-few-public-methods,
+
+    # pygame false positives
+    no-member,
+
+    # Accept TODOs in experimental code
+    fixme,
+
+    # Minor style noise
+    pointless-string-statement
+
+[FORMAT]
+max-line-length=100
+
+[IMPORTS]
+known-third-party=pygame,imageio,pytest

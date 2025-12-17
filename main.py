@@ -3,6 +3,8 @@ import pygame
 import sys
 import os
 
+from progress import update_progress
+
 from balle import Balle
 from cercle import Cercle
 from datetime import datetime
@@ -20,7 +22,7 @@ COULEUR_FOND = (0, 0, 0)  # gris foncé
 
 # MODE = "video"  → génère uniquement le MP4, aucune fenêtre visible
 # MODE = "play"   → affiche la fenêtre + génère le MP4
-MODE = "video"  # CHANGE ICI selon ton besoin
+MODE = "play"  # CHANGE ICI selon ton besoin
 
 
 # -------------------------------------
@@ -114,8 +116,8 @@ while running and frame_counter < total_frames:
     # --- Limite à 60 FPS ---
     clock.tick(FPS)
     frame_counter += 1
-    print(".")
-    # print(f"Frame {frame_counter}/{total_frames}", end="\r")
+    # Update progress in the same line
+    update_progress(frame_counter, total_frames)
 
 """------------------------------------------------------------------------------------------"""
 
@@ -129,4 +131,4 @@ if MODE == "video":
 pygame.quit()
 sys.exit()
 
-print(f"Vidéo générée : {output_path}")
+print(f"\nVideo generation complete! Saved to: {output_path}")
