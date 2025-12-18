@@ -1,4 +1,5 @@
 """Tests d'intégration pour main.py corrigés pour le nouveau main.py."""
+
 import sys
 from pathlib import Path
 from unittest.mock import patch, MagicMock
@@ -18,13 +19,12 @@ from cercle import Cercle
 class TestIntegrationBalleCercle:
     """Tests d'intégration entre la balle et le cercle."""
 
-    @patch('pygame.display.set_caption')
-    @patch('pygame.time.Clock')
-    @patch('pygame.event.get')
-    @patch('pygame.quit')
-    @patch('pygame.init')
-    def test_balle_rebond_sur_cercle(self, mock_init, mock_quit, mock_event_get,
-                                      mock_clock, mock_set_caption):
+    @patch("pygame.display.set_caption")
+    @patch("pygame.time.Clock")
+    @patch("pygame.event.get")
+    @patch("pygame.quit")
+    @patch("pygame.init")
+    def test_balle_rebond_sur_cercle(self, mock_init, mock_quit, mock_event_get, mock_clock, mock_set_caption):
         """Test que la balle rebondit correctement sur le cercle."""
         # Utiliser une vraie surface Pygame pour le dessin
         pygame.init()
@@ -41,22 +41,21 @@ class TestIntegrationBalleCercle:
         mock_clock_instance.tick.return_value = 60
 
         # Patch des arguments de ligne de commande
-        with patch('main.parse_arguments') as mock_parse:
-            mock_parse.return_value = argparse.Namespace(mode='play', duration=1, test=True)
-            with patch('sys.exit'):
+        with patch("main.parse_arguments") as mock_parse:
+            mock_parse.return_value = argparse.Namespace(mode="play", duration=1, test=True)
+            with patch("sys.exit"):
                 main.main()
 
 
 class TestModeVideo:
     """Tests pour le mode vidéo sans affichage graphique."""
 
-    @patch('pygame.init')
-    @patch('pygame.time.Clock')
-    @patch('pygame.event.get')
-    @patch('imageio.get_writer')
-    @patch('pygame.surfarray.array3d')
-    def test_mode_video_sans_affichage(self, mock_array3d, mock_get_writer,
-                                       mock_event_get, mock_clock, mock_init):
+    @patch("pygame.init")
+    @patch("pygame.time.Clock")
+    @patch("pygame.event.get")
+    @patch("imageio.get_writer")
+    @patch("pygame.surfarray.array3d")
+    def test_mode_video_sans_affichage(self, mock_array3d, mock_get_writer, mock_event_get, mock_clock, mock_init):
         """Test que le mode vidéo fonctionne sans affichage graphique."""
         # Utiliser une vraie surface Pygame
         pygame.init()
@@ -78,12 +77,12 @@ class TestModeVideo:
 
         # Mock array3d
         mock_array3d.return_value = MagicMock()
-        mock_array3d.return_value.swapaxes.return_value = b'frame_data'
+        mock_array3d.return_value.swapaxes.return_value = b"frame_data"
 
         # Patch des arguments de ligne de commande
-        with patch('main.parse_arguments') as mock_parse:
-            mock_parse.return_value = argparse.Namespace(mode='video', duration=1, test=True)
-            with patch('sys.exit'):
+        with patch("main.parse_arguments") as mock_parse:
+            mock_parse.return_value = argparse.Namespace(mode="video", duration=1, test=True)
+            with patch("sys.exit"):
                 main.main()
 
 
