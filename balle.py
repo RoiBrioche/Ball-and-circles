@@ -1,4 +1,5 @@
 import math
+import random
 import pygame
 
 
@@ -12,7 +13,12 @@ class Balle:
         self.couleur_contour = couleur_contour
         self.vx, self.vy = vitesse
 
-        # --- Nouveau : historique des positions ---
+        # Paramètres de réinjection d'énergie
+        self.vitesse_min = 3  # Seuil en dessous duquel on réinjecte de l'énergie
+        self.vitesse_random_min = 3  # Vitesse minimale après réinjection
+        self.vitesse_random_max = 6  # Vitesse maximale après réinjection
+
+        # Historique des positions
         self.positions = []  # liste [(x1, y1), (x2, y2), ...]
         self.max_positions = 80  # environ 1 seconde de traînée à 80 FPS
 
@@ -80,6 +86,10 @@ class Balle:
             self.x -= nx * penetration
             self.y -= ny * penetration
 
+            # Calcul de la vitesse actuelle avant rebond
+            vitesse_avant_rebond = math.sqrt(self.vx**2 + self.vy**2)
+            print("vitesse avr :",vitesse_avant_rebond)
+
             # Produit scalaire (V . n)
             dot = self.vx * nx + self.vy * ny
 
@@ -90,3 +100,28 @@ class Balle:
             # Légère perte d'énergie pour stabilité
             self.vx *= 0.98
             self.vy *= 0.98
+
+            # Vérification de la vitesse après rebond
+            vitesse_apres_rebond = math.sqrt(self.vx**2 + self.vy**2)
+            print("vitesse apr :",vitesse_apres_rebond)
+
+            # Si la vitesse est en dessous du seuil, on réinjecte de l'énergie
+            if vitesse_apres_rebond < self.vitesse_min:
+                # On conserve la direction actuelle
+                if vitesse_apres_rebond > 0:  # Éviter la division par zéro
+                    direction_x = self.vx / vitesse_apres_rebond
+                    direction_y = self.vy / vitesse_apres_rebond
+                else:
+                    # Si la vitesse est nulle (cas extrême), on utilise la normale
+                    direction_x = -nx
+                    direction_y = -ny
+                    # Normalisation
+                    norm = math.sqrt(direction_x**2 + direction_y**2)
+                    if norm > 0:
+                        direction_x /= norm
+                        direction_y /= norm
+
+                # Nouvelle vitesse aléatoire
+                nouvelle_vitesse = random.uniform(self.vitesse_random_min, self.vitesse_random_max)
+                self.vx = direction_x * nouvelle_vitesse
+                self.vy = direction_y * nouvelle_vitesse
