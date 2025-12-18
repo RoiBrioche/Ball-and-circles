@@ -88,7 +88,6 @@ class Balle:
 
             # Calcul de la vitesse actuelle avant rebond
             vitesse_avant_rebond = math.sqrt(self.vx**2 + self.vy**2)
-            print("vitesse avr :",vitesse_avant_rebond)
 
             # Produit scalaire (V . n)
             dot = self.vx * nx + self.vy * ny
@@ -103,7 +102,6 @@ class Balle:
 
             # Vérification de la vitesse après rebond
             vitesse_apres_rebond = math.sqrt(self.vx**2 + self.vy**2)
-            print("vitesse apr :",vitesse_apres_rebond)
 
             # Si la vitesse est en dessous du seuil, on réinjecte de l'énergie
             if vitesse_apres_rebond < self.vitesse_min:
