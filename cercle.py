@@ -12,13 +12,15 @@ class Cercle:
         epaisseur : épaisseur du trait
         section_trou : pourcentage de la portion manquante (0 à 100)
         """
+
         self.x = x
         self.y = y
         self.diametre = diametre
         self.rayon = diametre // 2
         self.couleur = couleur
         self.epaisseur = epaisseur
-        self.section_trou = section_trou  # 0 = cercle complet, 100 = cercle vide
+        # Contrainte pour section_trou entre 0 et 100
+        self.section_trou = max(0, min(100, section_trou))
 
     def draw(self, surface):
         """Dessine le cercle complet (ou partiel plus tard)."""
