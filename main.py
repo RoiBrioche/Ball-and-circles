@@ -116,6 +116,7 @@ def run_game(mode="play", duration_seconds=DURATION_SECONDS):
 
 def parse_arguments():
     import argparse
+
     parser = argparse.ArgumentParser(description="Simulation de rebonds de balle")
     parser.add_argument("--mode", type=str, default="play", choices=["play", "video"])
     parser.add_argument("--duration", type=int, default=DURATION_SECONDS)
