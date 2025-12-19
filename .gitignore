@@ -32,7 +32,7 @@ ENV/
 .coverage
 htmlcov/
 .pytest_cache/
-.coverage.*
+.coverage
 
 # Fichiers de développement
 .idea/
