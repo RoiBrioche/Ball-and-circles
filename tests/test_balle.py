@@ -158,6 +158,80 @@ class TestBalleRebondCercle:
         except Exception as e:
             pytest.fail(f"La méthode a échoué avec une vitesse nulle: {e}")
 
+    def test_un_seul_rebond_sur_contact_prolonge(self):
+        from cercle import Cercle
+
+        balle = Balle(0, 0, 10, (255, 0, 0), (0, 0, 0), vitesse=(5, 0))
+        cercle = Cercle(100, 0, 200)
+
+        # Forcer la balle sur la surface interne du cercle
+        balle.x = cercle.x + cercle.rayon - balle.rayon + 1
+        balle.y = cercle.y
+
+        balle.rebond_sur_cercle(cercle)
+        vx1, vy1 = balle.vx, balle.vy
+
+        for _ in range(5):
+            balle.rebond_sur_cercle(cercle)
+            assert balle.vx == vx1
+            assert balle.vy == vy1
+
+    def test_en_contact_passe_a_true_lors_du_premier_impact(self):
+        from cercle import Cercle
+
+        balle = Balle(100, 200, 10, (255, 0, 0), (0, 0, 0))
+        cercle = Cercle(150, 200, 100)
+
+        assert balle.en_contact is False
+
+        balle.rebond_sur_cercle(cercle)
+
+        assert balle.en_contact is True
+
+    def test_sortie_de_collision_rearme_en_contact(self):
+        from cercle import Cercle
+
+        balle = Balle(0, 0, 10, (255, 0, 0), (0, 0, 0))
+        cercle = Cercle(100, 0, 200)  # rayon = 100
+
+        # Forcer un impact (sur la paroi interne)
+        balle.x = cercle.x + cercle.rayon - balle.rayon + 1
+        balle.y = cercle.y
+
+        balle.rebond_sur_cercle(cercle)
+        assert balle.en_contact is True
+
+        # Sortie = retour à l'intérieur
+        balle.x = cercle.x
+        balle.y = cercle.y
+
+        balle.rebond_sur_cercle(cercle)
+        assert balle.en_contact is False
+
+    def test_nouveau_rebond_apres_sortie(self):
+        from cercle import Cercle
+
+        balle = Balle(100, 200, 10, (255, 0, 0), (0, 0, 0), vitesse=(5, 0))
+        cercle = Cercle(150, 200, 100)
+
+        # Premier impact
+        balle.rebond_sur_cercle(cercle)
+        vx1 = balle.vx
+
+        # Sortie
+        balle.x = 0
+        balle.y = 0
+        balle.rebond_sur_cercle(cercle)
+
+        # Retour vers le cercle
+        balle.x = 100
+        balle.y = 200
+        balle.vx = 5
+        balle.vy = 0
+
+        balle.rebond_sur_cercle(cercle)
+        assert balle.vx != vx1
+
 
 class TestBalleDraw:
     """Tests pour la méthode draw de la classe Balle."""
