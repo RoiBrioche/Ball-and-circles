@@ -81,7 +81,7 @@ def run_game(mode="play", duration_seconds=DURATION_SECONDS):
 
         # Mise à jour
         balle.update()
-        balle.rebond_sur_cercle(cercle)
+        balle.rebond_sur_cercle(cercle, frame_counter=frame_counter, FPS=FPS)
 
         # Rendu
         fenetre.fill(COULEUR_FOND)
