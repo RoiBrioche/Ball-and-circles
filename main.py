@@ -96,14 +96,14 @@ def run_game(mode="play", duration_seconds=DURATION_SECONDS):
                 frame = pygame.surfarray.array3d(fenetre).copy()
                 frame = frame.transpose(1, 0, 2)
                 writer.append_data(frame)
-                if frame_counter % 10 == 0:
-                    update_progress(frame_counter, total_frames)
+                update_progress(frame_counter, total_frames)
             except Exception as e:
                 print(f"Erreur capture frame {frame_counter}: {e}")
 
         if mode == "play":
             clock.tick(FPS)
         frame_counter += 1
+        update_progress(frame_counter, total_frames)
 
     # Nettoyage
     if writer is not None:
