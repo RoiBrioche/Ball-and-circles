@@ -13,7 +13,7 @@ DURATION_SECONDS = 61
 TOTAL_FRAMES = DURATION_SECONDS * FPS
 
 # Paramètres de la fenêtre
-LARGEUR = 1088  # 1088 est le multiple de 16 le plus proche de 1080
+LARGEUR = 1088
 HAUTEUR = 1920
 TITRE = "bounce_and_panic"
 COULEUR_FOND = (0, 0, 0)  # gris foncé
@@ -21,15 +21,27 @@ COULEUR_FOND = (0, 0, 0)  # gris foncé
 
 def init_pygame(mode="play"):
     """Initialise Pygame et retourne la fenêtre et l'horloge."""
+    print(f"Initialisation de Pygame en mode: {mode}")
     if mode == "video":
+        print("Configuration du mode vidéo (dummy)")
         os.environ["SDL_VIDEODRIVER"] = "dummy"
-
-    pygame.init()
-    fenetre = pygame.display.set_mode((LARGEUR, HAUTEUR))
-    pygame.display.set_caption(TITRE)
-    clock = pygame.time.Clock()
-
-    return fenetre, clock
+        os.environ["SDL_VIDEO_CENTERED"] = "1"
+        try:
+            pygame.display.init()
+            surface = pygame.Surface((LARGEUR, HAUTEUR))
+            return surface, pygame.time.Clock()
+        except Exception as e:
+            print(f"Erreur lors de l'initialisation du mode vidéo: {e}")
+            raise
+    else:
+        try:
+            pygame.init()
+            fenetre = pygame.display.set_mode((LARGEUR, HAUTEUR))
+            pygame.display.set_caption(TITRE)
+            return fenetre, pygame.time.Clock()
+        except Exception as e:
+            print(f"Erreur lors de l'initialisation du mode jeu: {e}")
+            raise
 
 
 def create_output_path():
@@ -41,45 +53,33 @@ def create_output_path():
 
 
 def run_game(mode="play", duration_seconds=DURATION_SECONDS):
-    """Fonction principale du jeu.
+    """Fonction principale du jeu."""
+    print(f"\nDémarrage du jeu en mode: {mode} ({duration_seconds} secondes)")
 
-    Args:
-        mode: "play" pour afficher la fenêtre, "video" pour générer uniquement la vidéo
-        duration_seconds: durée de la simulation en secondes
-    """
-    # Initialisation
     fenetre, clock = init_pygame(mode)
     output_path = create_output_path()
+    print(f"Chemin de sortie de la vidéo: {output_path}")
 
     # Création des objets
-    balle = Balle(
-        x=LARGEUR // 2,
-        y=HAUTEUR // 2 - 100,
-        rayon=20,
-        couleur_centre=(255, 0, 0),
-        couleur_contour=(255, 255, 255),
-    )
+    balle = Balle(LARGEUR // 2, HAUTEUR // 2 - 100, 20, (255, 0, 0), (255, 255, 255))
     cercle = Cercle(LARGEUR // 2, HAUTEUR // 2, 300, (255, 255, 255), 3)
 
-    # Initialisation de l'enregistrement vidéo si nécessaire
     writer = None
     if mode == "video":
         writer = imageio.get_writer(output_path, fps=FPS)
 
-    # Boucle principale
     total_frames = FPS * duration_seconds
     frame_counter = 0
     running = True
 
     while running and frame_counter < total_frames:
-        # Gestion des événements
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             elif mode == "play" and event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 running = False
 
-        # Mise à jour de la logique du jeu
+        # Mise à jour
         balle.update()
         balle.rebond_sur_cercle(cercle)
 
@@ -87,23 +87,27 @@ def run_game(mode="play", duration_seconds=DURATION_SECONDS):
         fenetre.fill(COULEUR_FOND)
         cercle.draw(fenetre)
         balle.draw(fenetre)
-        pygame.display.flip()
+        if mode == "play":
+            pygame.display.flip()
 
-        # Capture de la frame pour la vidéo
+        # Capture des frames pour la vidéo
         if mode == "video":
-            frame = pygame.surfarray.array3d(fenetre)
-            frame = frame.swapaxes(0, 1)
-            writer.append_data(frame)
+            try:
+                frame = pygame.surfarray.array3d(fenetre).copy()
+                frame = frame.transpose(1, 0, 2)
+                writer.append_data(frame)
+                update_progress(frame_counter, total_frames)
+            except Exception as e:
+                print(f"Erreur capture frame {frame_counter}: {e}")
 
-        # Contrôle de la vitesse de la boucle
-        clock.tick(FPS)
+        if mode == "play":
+            clock.tick(FPS)
         frame_counter += 1
         update_progress(frame_counter, total_frames)
 
     # Nettoyage
     if writer is not None:
         writer.close()
-
     pygame.quit()
 
     if mode == "video":
@@ -111,33 +115,18 @@ def run_game(mode="play", duration_seconds=DURATION_SECONDS):
 
 
 def parse_arguments():
-    """Parse les arguments en ligne de commande."""
     import argparse
 
     parser = argparse.ArgumentParser(description="Simulation de rebonds de balle")
-    parser.add_argument(
-        "--mode",
-        type=str,
-        default="play",
-        choices=["play", "video"],
-        help="Mode d'exécution: play (affichage) ou video (génération vidéo)",
-    )
-    parser.add_argument("--duration", type=int, default=DURATION_SECONDS, help="Durée de la simulation en secondes")
-    parser.add_argument("--test", action="store_true", help="Mode test (réduit la durée automatiquement)")
-
+    parser.add_argument("--mode", type=str, default="play", choices=["play", "video"])
+    parser.add_argument("--duration", type=int, default=DURATION_SECONDS)
+    parser.add_argument("--test", action="store_true")
     return parser.parse_args()
 
 
 def main():
-    """Point d'entrée principal du programme."""
     args = parse_arguments()
-
-    # En mode test, on réduit la durée
-    if args.test:
-        duration = 5  # Durée courte pour les tests
-    else:
-        duration = args.duration
-
+    duration = 5 if args.test else args.duration
     try:
         run_game(mode=args.mode, duration_seconds=duration)
     except KeyboardInterrupt:

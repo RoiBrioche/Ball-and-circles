@@ -12,6 +12,7 @@ class Balle:
         self.couleur_centre = couleur_centre
         self.couleur_contour = couleur_contour
         self.vx, self.vy = vitesse
+        self.en_contact = False  # État de contact avec le cercle
 
         # Paramètres de réinjection d'énergie
         self.vitesse_min = 3  # Seuil en dessous duquel on réinjecte de l'énergie
@@ -70,13 +71,23 @@ class Balle:
         distance = math.sqrt(dx**2 + dy**2)
 
         if distance == 0:
+            self.en_contact = False
             return  # éviter la division par zéro
 
         # Rayon de contact
         rayon_contact = cercle.rayon - self.rayon
 
-        # Si la balle touche ou pénètre le cercle
-        if distance >= rayon_contact:
+        # Détection de collision (sans forcément rebondir)
+        collision = distance >= rayon_contact
+
+        # Nouvel impact = collision détectée alors qu'on n'était pas en contact avant
+        nouvel_impact = collision and not self.en_contact
+
+        # Mise à jour de l'état de contact pour la prochaine frame
+        self.en_contact = collision
+
+        # Si c'est un nouvel impact, on applique la physique du rebond
+        if nouvel_impact:
             # Normal au point d'impact
             nx = dx / distance
             ny = dy / distance
