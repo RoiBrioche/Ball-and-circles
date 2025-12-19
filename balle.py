@@ -1,6 +1,16 @@
 import math
 import random
 import pygame
+from dataclasses import dataclass
+from typing import List, Tuple
+
+
+@dataclass
+class RebondEvent:
+    time_sec: float
+    index: int = 0
+    vitesse: float = 0.0
+    position: Tuple[float, float] = (0.0, 0.0)
 
 
 # --- Classe Balle ---
@@ -22,6 +32,10 @@ class Balle:
         # Historique des positions
         self.positions = []  # liste [(x1, y1), (x2, y2), ...]
         self.max_positions = 80  # environ 1 seconde de traînée à 80 FPS
+
+        # Système d'événements de rebond
+        self.rebond_events: List[RebondEvent] = []  # liste des RebondEvent
+        self.rebond_index = 0  # compteur pour numéroter les rebonds
 
     def draw(self, surface):
 
@@ -64,8 +78,14 @@ class Balle:
         if len(self.positions) > self.max_positions:
             self.positions.pop(0)
 
-    def rebond_sur_cercle(self, cercle):
-        """Détecte et applique le rebond sur le cercle donné."""
+    def rebond_sur_cercle(self, cercle, frame_counter=0, FPS=65):
+        """Détecte et applique le rebond sur le cercle donné.
+
+        Args:
+            cercle: L'objet cercle sur lequel la balle peut rebondir
+            frame_counter: Compteur de frames pour le timestamp
+            FPS: Nombre d'images par seconde pour le calcul du temps
+        """
         dx = self.x - cercle.x
         dy = self.y - cercle.y
         distance = math.sqrt(dx**2 + dy**2)
@@ -91,6 +111,16 @@ class Balle:
             # Normal au point d'impact
             nx = dx / distance
             ny = dy / distance
+
+            # Création de l'événement horodaté
+            time_sec = frame_counter / FPS
+            vitesse_actuelle = math.sqrt(self.vx**2 + self.vy**2)
+            self.rebond_events.append(
+                RebondEvent(
+                    time_sec=time_sec, index=self.rebond_index, vitesse=vitesse_actuelle, position=(self.x, self.y)
+                )
+            )
+            self.rebond_index += 1
 
             # Correction de position pour éviter la pénétration
             penetration = distance - rayon_contact
