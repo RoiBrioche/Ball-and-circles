@@ -85,6 +85,9 @@ class Balle:
             cercle: L'objet cercle sur lequel la balle peut rebondir
             frame_counter: Compteur de frames pour le timestamp
             FPS: Nombre d'images par seconde pour le calcul du temps
+
+        Returns:
+            RebondEvent: L'événement de rebond si un nouvel impact est détecté, None sinon
         """
         dx = self.x - cercle.x
         dy = self.y - cercle.y
@@ -92,7 +95,7 @@ class Balle:
 
         if distance == 0:
             self.en_contact = False
-            return  # éviter la division par zéro
+            return None  # éviter la division par zéro
 
         # Rayon de contact
         rayon_contact = cercle.rayon - self.rayon
@@ -106,6 +109,8 @@ class Balle:
         # Mise à jour de l'état de contact pour la prochaine frame
         self.en_contact = collision
 
+        rebond_event = None
+
         # Si c'est un nouvel impact, on applique la physique du rebond
         if nouvel_impact:
             # Normal au point d'impact
@@ -115,11 +120,10 @@ class Balle:
             # Création de l'événement horodaté
             time_sec = frame_counter / FPS
             vitesse_actuelle = math.sqrt(self.vx**2 + self.vy**2)
-            self.rebond_events.append(
-                RebondEvent(
-                    time_sec=time_sec, index=self.rebond_index, vitesse=vitesse_actuelle, position=(self.x, self.y)
-                )
+            rebond_event = RebondEvent(
+                time_sec=time_sec, index=self.rebond_index, vitesse=vitesse_actuelle, position=(self.x, self.y)
             )
+            self.rebond_events.append(rebond_event)
             self.rebond_index += 1
 
             # Correction de position pour éviter la pénétration
@@ -164,3 +168,5 @@ class Balle:
                 nouvelle_vitesse = random.uniform(self.vitesse_random_min, self.vitesse_random_max)
                 self.vx = direction_x * nouvelle_vitesse
                 self.vy = direction_y * nouvelle_vitesse
+
+        return rebond_event

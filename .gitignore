@@ -47,3 +47,6 @@ videos/
 # Fichiers système
 .DS_Store
 Thumbs.db
+
+#log
+rebonds_log.json

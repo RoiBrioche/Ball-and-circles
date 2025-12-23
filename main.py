@@ -5,6 +5,7 @@ import os
 from progress import update_progress
 from balle import Balle
 from cercle import Cercle
+from simulation_logger import SimulationLogger
 from datetime import datetime
 
 # Constantes
@@ -64,6 +65,10 @@ def run_game(mode="play", duration_seconds=DURATION_SECONDS):
     balle = Balle(LARGEUR // 2, HAUTEUR // 2 - 100, 20, (255, 0, 0), (255, 255, 255))
     cercle = Cercle(LARGEUR // 2, HAUTEUR // 2, 300, (255, 255, 255), 3)
 
+    # Initialisation du logger de simulation
+    logger = SimulationLogger("rebonds_log.json")
+    logger.set_fps(FPS)
+
     writer = None
     if mode == "video":
         writer = imageio.get_writer(output_path, fps=FPS)
@@ -81,7 +86,11 @@ def run_game(mode="play", duration_seconds=DURATION_SECONDS):
 
         # Mise à jour
         balle.update()
-        balle.rebond_sur_cercle(cercle, frame_counter=frame_counter, FPS=FPS)
+
+        # Gestion des rebonds et enregistrement des événements
+        rebond_event = balle.rebond_sur_cercle(cercle, frame_counter=frame_counter, FPS=FPS)
+        if rebond_event is not None:
+            logger.log_rebound(rebond_event)
 
         # Rendu
         fenetre.fill(COULEUR_FOND)
@@ -108,6 +117,14 @@ def run_game(mode="play", duration_seconds=DURATION_SECONDS):
     # Nettoyage
     if writer is not None:
         writer.close()
+
+    # Sauvegarde des logs de simulation
+    try:
+        logger.flush()
+        print(f"\nLogs de simulation sauvegardés dans : rebonds_log.json")
+    except Exception as e:
+        print(f"\nErreur lors de la sauvegarde des logs : {e}")
+
     pygame.quit()
 
     if mode == "video":
