@@ -10,7 +10,8 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from cercle import Cercle
+from src.cercle import Cercle
+from src.balle import Balle
 
 
 class TestCercleInitialisation:
@@ -92,7 +93,7 @@ class TestCercleCollision:
 
     def test_collision_avec_balle(self):
         """Test la détection de collision entre un cercle et une balle."""
-        from balle import Balle
+        from src.balle import Balle
 
         # Création d'un cercle et d'une balle qui le touche
         cercle = Cercle(200, 200, 100)  # Cercle de rayon 50
@@ -108,7 +109,7 @@ class TestCercleCollision:
 
     def test_pas_de_collision(self):
         """Test qu'il n'y a pas de collision quand les objets sont éloignés."""
-        from balle import Balle
+        from src.balle import Balle
 
         # Création d'un cercle et d'une balle éloignés
         cercle = Cercle(200, 200, 100)  # Cercle de rayon 50

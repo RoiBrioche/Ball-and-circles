@@ -9,7 +9,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 # Import de la fonction à tester
-from progress import update_progress
+from src.progress import update_progress
 
 
 class TestProgressUpdate:

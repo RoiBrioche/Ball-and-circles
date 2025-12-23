@@ -1,8 +1,9 @@
 import json
+
 from datetime import datetime
-from typing import Dict, List, Optional, Any
-from dataclasses import asdict
-from balle import RebondEvent
+from typing import Any, Dict, List, Optional
+
+from src.balle import RebondEvent
 
 
 class SimulationLogger:

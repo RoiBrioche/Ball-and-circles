@@ -8,8 +8,8 @@ from datetime import datetime
 from dataclasses import asdict
 
 # Import des classes à tester
-from simulation_logger import SimulationLogger
-from balle import RebondEvent, Balle
+from src.simulation_logger import SimulationLogger
+from src.balle import RebondEvent, Balle
 
 
 class TestSimulationLogger:

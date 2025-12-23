@@ -1,6 +1,7 @@
 import math
-import random
 import pygame
+import random
+
 from dataclasses import dataclass
 from typing import List, Tuple
 
