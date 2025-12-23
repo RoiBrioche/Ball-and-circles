@@ -11,8 +11,8 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from balle import Balle, RebondEvent
-from cercle import Cercle
+from src.balle import Balle, RebondEvent
+from src.cercle import Cercle
 
 
 class TestBalleInitialisation:
@@ -89,7 +89,7 @@ class TestBalleRebondCercle:
 
     def test_collision_frontale(self):
         """Test une collision frontale avec un cercle."""
-        from cercle import Cercle
+        from src.cercle import Cercle
 
         # Création d'une balle se déplaçant vers la droite
         balle = Balle(100, 201, 10, (255, 0, 0), (0, 0, 0), vitesse=(10, 0))
@@ -108,7 +108,7 @@ class TestBalleRebondCercle:
 
     def test_collision_tangentielle(self):
         """Test une collision tangentielle avec un cercle."""
-        from cercle import Cercle
+        from src.cercle import Cercle
 
         # Balle se déplaçant horizontalement, juste au-dessus du cercle
         balle = Balle(100, 100, 10, (255, 0, 0), (0, 0, 0), vitesse=(10, 0))
@@ -125,7 +125,7 @@ class TestBalleRebondCercle:
 
     def test_reinjection_energie_vitesse_basse(self):
         """Vérifie la réinjection d'énergie quand la vitesse est trop basse."""
-        from cercle import Cercle
+        from src.cercle import Cercle
 
         # Balle avec une vitesse très basse
         balle = Balle(100, 100, 10, (255, 0, 0), (0, 0, 0), vitesse=(0.1, 0.1))
@@ -143,7 +143,7 @@ class TestBalleRebondCercle:
 
     def test_collision_vitesse_nulle(self):
         """Test le comportement avec une vitesse nulle."""
-        from cercle import Cercle
+        from src.cercle import Cercle
 
         # Balle sans vitesse initiale
         balle = Balle(100, 100, 10, (255, 0, 0), (0, 0, 0), vitesse=(0, 0))
@@ -160,7 +160,7 @@ class TestBalleRebondCercle:
             pytest.fail(f"La méthode a échoué avec une vitesse nulle: {e}")
 
     def test_un_seul_rebond_sur_contact_prolonge(self):
-        from cercle import Cercle
+        from src.cercle import Cercle
 
         balle = Balle(0, 0, 10, (255, 0, 0), (0, 0, 0), vitesse=(5, 0))
         cercle = Cercle(100, 0, 200)
@@ -178,7 +178,7 @@ class TestBalleRebondCercle:
             assert balle.vy == vy1
 
     def test_en_contact_passe_a_true_lors_du_premier_impact(self):
-        from cercle import Cercle
+        from src.cercle import Cercle
 
         balle = Balle(100, 200, 10, (255, 0, 0), (0, 0, 0))
         cercle = Cercle(150, 200, 100)
@@ -190,7 +190,7 @@ class TestBalleRebondCercle:
         assert balle.en_contact is True
 
     def test_sortie_de_collision_rearme_en_contact(self):
-        from cercle import Cercle
+        from src.cercle import Cercle
 
         balle = Balle(0, 0, 10, (255, 0, 0), (0, 0, 0))
         cercle = Cercle(100, 0, 200)  # rayon = 100
@@ -210,7 +210,7 @@ class TestBalleRebondCercle:
         assert balle.en_contact is False
 
     def test_nouveau_rebond_apres_sortie(self):
-        from cercle import Cercle
+        from src.cercle import Cercle
 
         balle = Balle(100, 200, 10, (255, 0, 0), (0, 0, 0), vitesse=(5, 0))
         cercle = Cercle(150, 200, 100)
@@ -289,7 +289,7 @@ class TestBalleRebondEvents:
     def test_evenement_cree_au_rebond(self):
         """Vérifie qu'un événement est créé lors d'un rebond."""
 
-        from cercle import Cercle
+        from src.cercle import Cercle
 
         balle = Balle(0, 0, 10, (255, 0, 0), (0, 0, 0), vitesse=(0, 5))
         cercle = Cercle(0, 20, 15)
@@ -305,7 +305,7 @@ class TestBalleRebondEvents:
     def test_ordre_et_timestamps(self):
         """Vérifie que les événements sont dans l'ordre et ont le bon timestamp."""
 
-        from cercle import Cercle
+        from src.cercle import Cercle
 
         balle = Balle(0, 0, 10, (255, 0, 0), (0, 0, 0), vitesse=(0, 5))
         cercle = Cercle(0, 50, 15)
@@ -324,7 +324,7 @@ class TestBalleRebondEvents:
     def test_determinisme_evenements(self):
         """Vérifie que deux simulations identiques produisent les mêmes événements."""
 
-        from cercle import Cercle
+        from src.cercle import Cercle
 
         def simulate():
             balle = Balle(0, 0, 10, (255, 0, 0), (0, 0, 0), vitesse=(0, 5))
@@ -340,7 +340,7 @@ class TestBalleRebondEvents:
 
     def test_metadonnees_evenement(self):
         """Vérifie que chaque événement contient des informations cohérentes."""
-        from cercle import Cercle
+        from src.cercle import Cercle
 
         balle = Balle(0, 0, 10, (255, 0, 0), (0, 0, 0), vitesse=(0, 5))
         cercle = Cercle(0, 50, 15)
@@ -358,7 +358,7 @@ class TestBalleRebondEvents:
     def test_pas_de_rebond_pas_d_evenement(self):
         """Aucun événement tant que la balle reste à l'intérieur du cercle."""
 
-        from cercle import Cercle
+        from src.cercle import Cercle
 
         cercle = Cercle(0, 0, 100)
         balle = Balle(0, 0, 10, (255, 0, 0), (0, 0, 0), vitesse=(0, 0))

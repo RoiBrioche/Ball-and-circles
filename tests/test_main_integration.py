@@ -2,6 +2,7 @@
 
 import sys
 from pathlib import Path
+from src.main import run_game, init_pygame
 from unittest.mock import patch, MagicMock
 import pytest
 import argparse
@@ -11,9 +12,9 @@ import pygame
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-import main
-from balle import Balle
-from cercle import Cercle
+import src.main as main
+from src.balle import Balle
+from src.cercle import Cercle
 
 
 class TestIntegrationBalleCercle:
@@ -41,7 +42,7 @@ class TestIntegrationBalleCercle:
         mock_clock_instance.tick.return_value = 60
 
         # Patch des arguments de ligne de commande
-        with patch("main.parse_arguments") as mock_parse:
+        with patch("src.main.parse_arguments") as mock_parse:
             mock_parse.return_value = argparse.Namespace(mode="play", duration=1, test=True)
             with patch("sys.exit"):
                 main.main()
@@ -80,7 +81,7 @@ class TestModeVideo:
         mock_array3d.return_value.swapaxes.return_value = b"frame_data"
 
         # Patch des arguments de ligne de commande
-        with patch("main.parse_arguments") as mock_parse:
+        with patch("src.main.parse_arguments") as mock_parse:
             mock_parse.return_value = argparse.Namespace(mode="video", duration=1, test=True)
             with patch("sys.exit"):
                 main.main()
