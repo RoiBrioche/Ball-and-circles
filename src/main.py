@@ -1,12 +1,14 @@
+from datetime import datetime
 import imageio
+import os
 import pygame
 import sys
-import os
+
 from src.progress import update_progress
 from src.balle import Balle
 from src.cercle import Cercle
 from src.simulation_logger import SimulationLogger
-from datetime import datetime
+
 
 # Constantes
 FPS = 65
