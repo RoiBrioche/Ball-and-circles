@@ -2,10 +2,10 @@ import imageio
 import pygame
 import sys
 import os
-from progress import update_progress
-from balle import Balle
-from cercle import Cercle
-from simulation_logger import SimulationLogger
+from src.progress import update_progress
+from src.balle import Balle
+from src.cercle import Cercle
+from src.simulation_logger import SimulationLogger
 from datetime import datetime
 
 # Constantes
