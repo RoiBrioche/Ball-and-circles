@@ -11,7 +11,7 @@ from unittest.mock import patch
 # Add the src directory to the path to import the module
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "src"))
 
-from midi_manager import MidiManager, MidiNote  # noqa: E402
+from src.midi_manager import MidiManager, MidiNote  # noqa: E402
 
 
 def create_temp_midi():
