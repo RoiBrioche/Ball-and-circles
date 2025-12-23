@@ -1,6 +1,16 @@
 import math
 import random
 import pygame
+from dataclasses import dataclass
+from typing import List, Tuple
+
+
+@dataclass
+class RebondEvent:
+    time_sec: float
+    index: int = 0
+    vitesse: float = 0.0
+    position: Tuple[float, float] = (0.0, 0.0)
 
 
 # --- Classe Balle ---
@@ -22,6 +32,10 @@ class Balle:
         # Historique des positions
         self.positions = []  # liste [(x1, y1), (x2, y2), ...]
         self.max_positions = 80  # environ 1 seconde de traînée à 80 FPS
+
+        # Système d'événements de rebond
+        self.rebond_events: List[RebondEvent] = []  # liste des RebondEvent
+        self.rebond_index = 0  # compteur pour numéroter les rebonds
 
     def draw(self, surface):
 
@@ -64,15 +78,24 @@ class Balle:
         if len(self.positions) > self.max_positions:
             self.positions.pop(0)
 
-    def rebond_sur_cercle(self, cercle):
-        """Détecte et applique le rebond sur le cercle donné."""
+    def rebond_sur_cercle(self, cercle, frame_counter=0, FPS=65):
+        """Détecte et applique le rebond sur le cercle donné.
+
+        Args:
+            cercle: L'objet cercle sur lequel la balle peut rebondir
+            frame_counter: Compteur de frames pour le timestamp
+            FPS: Nombre d'images par seconde pour le calcul du temps
+
+        Returns:
+            RebondEvent: L'événement de rebond si un nouvel impact est détecté, None sinon
+        """
         dx = self.x - cercle.x
         dy = self.y - cercle.y
         distance = math.sqrt(dx**2 + dy**2)
 
         if distance == 0:
             self.en_contact = False
-            return  # éviter la division par zéro
+            return None  # éviter la division par zéro
 
         # Rayon de contact
         rayon_contact = cercle.rayon - self.rayon
@@ -86,11 +109,22 @@ class Balle:
         # Mise à jour de l'état de contact pour la prochaine frame
         self.en_contact = collision
 
+        rebond_event = None
+
         # Si c'est un nouvel impact, on applique la physique du rebond
         if nouvel_impact:
             # Normal au point d'impact
             nx = dx / distance
             ny = dy / distance
+
+            # Création de l'événement horodaté
+            time_sec = frame_counter / FPS
+            vitesse_actuelle = math.sqrt(self.vx**2 + self.vy**2)
+            rebond_event = RebondEvent(
+                time_sec=time_sec, index=self.rebond_index, vitesse=vitesse_actuelle, position=(self.x, self.y)
+            )
+            self.rebond_events.append(rebond_event)
+            self.rebond_index += 1
 
             # Correction de position pour éviter la pénétration
             penetration = distance - rayon_contact
@@ -134,3 +168,5 @@ class Balle:
                 nouvelle_vitesse = random.uniform(self.vitesse_random_min, self.vitesse_random_max)
                 self.vx = direction_x * nouvelle_vitesse
                 self.vy = direction_y * nouvelle_vitesse
+
+        return rebond_event

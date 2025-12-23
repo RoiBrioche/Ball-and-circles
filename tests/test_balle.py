@@ -11,7 +11,8 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from balle import Balle
+from balle import Balle, RebondEvent
+from cercle import Cercle
 
 
 class TestBalleInitialisation:
@@ -280,3 +281,93 @@ class TestBalleDraw:
 
         # Vérifie que pygame.draw.line a été appelé pour la traînée
         assert mock_draw_line.called
+
+
+class TestBalleRebondEvents:
+    """Tests pour le système d'événements de rebond horodatés."""
+
+    def test_evenement_cree_au_rebond(self):
+        """Vérifie qu'un événement est créé lors d'un rebond."""
+
+        from cercle import Cercle
+
+        balle = Balle(0, 0, 10, (255, 0, 0), (0, 0, 0), vitesse=(0, 5))
+        cercle = Cercle(0, 20, 15)
+
+        assert len(balle.rebond_events) == 0
+
+        for frame in range(10):
+            balle.update()
+            balle.rebond_sur_cercle(cercle, frame_counter=frame, FPS=10)
+
+        assert len(balle.rebond_events) >= 1
+
+    def test_ordre_et_timestamps(self):
+        """Vérifie que les événements sont dans l'ordre et ont le bon timestamp."""
+
+        from cercle import Cercle
+
+        balle = Balle(0, 0, 10, (255, 0, 0), (0, 0, 0), vitesse=(0, 5))
+        cercle = Cercle(0, 50, 15)
+        FPS = 10
+
+        for frame in range(20):
+            balle.update()
+            balle.rebond_sur_cercle(cercle, frame_counter=frame, FPS=FPS)
+
+        events = balle.rebond_events
+        for i, event in enumerate(events):
+            assert event.time_sec >= 0
+            if i > 0:
+                assert event.time_sec >= events[i - 1].time_sec
+
+    def test_determinisme_evenements(self):
+        """Vérifie que deux simulations identiques produisent les mêmes événements."""
+
+        from cercle import Cercle
+
+        def simulate():
+            balle = Balle(0, 0, 10, (255, 0, 0), (0, 0, 0), vitesse=(0, 5))
+            cercle = Cercle(0, 50, 15)
+            for frame in range(10):
+                balle.update()
+                balle.rebond_sur_cercle(cercle, frame_counter=frame, FPS=10)
+            return balle.rebond_events
+
+        events1 = simulate()
+        events2 = simulate()
+        assert events1 == events2
+
+    def test_metadonnees_evenement(self):
+        """Vérifie que chaque événement contient des informations cohérentes."""
+        from cercle import Cercle
+
+        balle = Balle(0, 0, 10, (255, 0, 0), (0, 0, 0), vitesse=(0, 5))
+        cercle = Cercle(0, 50, 15)
+
+        for frame in range(10):
+            balle.update()
+            balle.rebond_sur_cercle(cercle, frame_counter=frame, FPS=10)
+
+        assert len(balle.rebond_events) >= 1
+        event = balle.rebond_events[0]
+        assert event.vitesse > 0
+        assert isinstance(event.position, tuple)
+        assert len(event.position) == 2
+
+    def test_pas_de_rebond_pas_d_evenement(self):
+        """Aucun événement tant que la balle reste à l'intérieur du cercle."""
+
+        from cercle import Cercle
+
+        cercle = Cercle(0, 0, 100)
+        balle = Balle(0, 0, 10, (255, 0, 0), (0, 0, 0), vitesse=(0, 0))
+
+        # Forcer l'état initial : balle déjà en contact (à l'intérieur)
+        balle.en_contact = True
+
+        for frame in range(10):
+            balle.update()
+            balle.rebond_sur_cercle(cercle, frame_counter=frame, FPS=10)
+
+        assert len(balle.rebond_events) == 0
