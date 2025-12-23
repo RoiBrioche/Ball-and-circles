@@ -10,15 +10,13 @@ from dataclasses import dataclass
 from typing import List, Optional, Tuple
 
 # Import pretty_midi with a clear error message if not available
-PRETTY_MIDI_AVAILABLE = False
-pretty_midi = None
-
 try:
-    import pretty_midi
+    import pretty_midi  # type: ignore
 
     PRETTY_MIDI_AVAILABLE = True
 except ImportError:
-    pass
+    pretty_midi = None
+    PRETTY_MIDI_AVAILABLE = False
 
 
 @dataclass
