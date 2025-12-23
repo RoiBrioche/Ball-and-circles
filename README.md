@@ -60,7 +60,7 @@ pip install -r requirements.txt
 
 ```bash
 
-python main.py
+python -m src.main
 
 ```
 
