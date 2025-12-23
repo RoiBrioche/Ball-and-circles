@@ -3,8 +3,11 @@ import os
 import pygame
 import sys
 
+from abc import ABC
 from datetime import datetime
+from typing import Optional, Type
 
+from src.audio_engine import AudioEngine
 from src.balle import Balle
 from src.cercle import Cercle
 from src.progress import update_progress
@@ -56,9 +59,19 @@ def create_output_path():
     return os.path.join(output_folder, f"simulation_{now}.mp4")
 
 
-def run_game(mode="play", duration_seconds=DURATION_SECONDS):
-    """Fonction principale du jeu."""
+def run_game(mode="play", duration_seconds=DURATION_SECONDS, audio_engine: Optional[AudioEngine] = None):
+    """Fonction principale du jeu.
+
+    Args:
+        mode: Mode d'exécution ('play' ou 'video')
+        duration_seconds: Durée de la simulation en secondes
+        audio_engine: Moteur audio optionnel pour gérer les sons de rebond
+    """
     print(f"\nDémarrage du jeu en mode: {mode} ({duration_seconds} secondes)")
+
+    # Initialisation du moteur audio si fourni
+    if audio_engine is not None:
+        print("Moteur audio détecté - activation des sons de rebond")
 
     fenetre, clock = init_pygame(mode)
     output_path = create_output_path()
@@ -95,6 +108,13 @@ def run_game(mode="play", duration_seconds=DURATION_SECONDS):
         if rebond_event is not None:
             logger.log_rebound(rebond_event)
 
+            # Notification du rebond au moteur audio si disponible
+            if audio_engine is not None:
+                try:
+                    audio_engine.on_rebond(rebond_event["time_sec"])
+                except Exception as e:
+                    print(f"Erreur lors de la notification audio du rebond: {e}")
+
         # Rendu
         fenetre.fill(COULEUR_FOND)
         cercle.draw(fenetre)
@@ -121,6 +141,13 @@ def run_game(mode="play", duration_seconds=DURATION_SECONDS):
     if writer is not None:
         writer.close()
 
+    # Finalisation du moteur audio si disponible
+    if audio_engine is not None:
+        try:
+            audio_engine.finalize()
+        except Exception as e:
+            print(f"Erreur lors de la finalisation du moteur audio: {e}")
+
     # Sauvegarde des logs de simulation
     try:
         logger.flush()
@@ -138,19 +165,34 @@ def parse_arguments():
     import argparse
 
     parser = argparse.ArgumentParser(description="Simulation de rebonds de balle")
-    parser.add_argument("--mode", type=str, default="play", choices=["play", "video"])
-    parser.add_argument("--duration", type=int, default=DURATION_SECONDS)
-    parser.add_argument("--test", action="store_true")
+    parser.add_argument(
+        "--mode",
+        type=str,
+        default="play",
+        choices=["play", "video"],
+        help="Mode d'exécution: 'play' pour l'affichage temps réel, 'video' pour générer une vidéo",
+    )
+    parser.add_argument("--duration", type=int, default=DURATION_SECONDS, help="Durée de la simulation en secondes")
+    parser.add_argument("--test", action="store_true", help="Mode test (durée réduite à 5 secondes)")
+    parser.add_argument("--no-audio", action="store_true", help="Désactive la sortie audio")
     return parser.parse_args()
 
 
 def main():
     args = parse_arguments()
     duration = 5 if args.test else args.duration
+
+    # Initialisation du moteur audio (None pour l'instant, sera implémenté plus tard)
+    audio_engine = None
+    no_audio = getattr(args, "no_audio", False)
+
     try:
-        run_game(mode=args.mode, duration_seconds=duration)
+        run_game(mode=args.mode, duration_seconds=duration, audio_engine=audio_engine if not no_audio else None)
     except KeyboardInterrupt:
         print("\nArrêt du programme par l'utilisateur")
+    except Exception as e:
+        print(f"\nErreur lors de l'exécution: {e}")
+        raise
     finally:
         pygame.quit()
         sys.exit(0)
