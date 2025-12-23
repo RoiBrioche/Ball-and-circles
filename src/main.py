@@ -1,12 +1,13 @@
-from datetime import datetime
 import imageio
 import os
 import pygame
 import sys
 
-from src.progress import update_progress
+from datetime import datetime
+
 from src.balle import Balle
 from src.cercle import Cercle
+from src.progress import update_progress
 from src.simulation_logger import SimulationLogger
 
 
