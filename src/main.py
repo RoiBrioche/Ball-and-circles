@@ -124,6 +124,8 @@ def run_game(mode="play", duration_seconds=DURATION_SECONDS, audio_engine: Optio
 
         # Capture des frames pour la vidéo
         if mode == "video":
+            if writer is None:
+                raise RuntimeError("Writer should be initialized in video mode")
             try:
                 frame = pygame.surfarray.array3d(fenetre).copy()
                 frame = frame.transpose(1, 0, 2)
