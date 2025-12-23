@@ -4,7 +4,7 @@ import os
 import sys
 import unittest
 import tempfile
-import pretty_midi
+import pretty_midi  # type: ignore
 
 from unittest.mock import patch
 
